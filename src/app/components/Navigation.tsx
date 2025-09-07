@@ -1,25 +1,45 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import type { ContentType } from '../page';
 
-const navItems = ['Home', 'Photos', 'Videos', 'Live Streams', 'Messages'];
+interface NavigationProps {
+    activeContent: ContentType;
+    onContentChange: (content: ContentType) => void;
+}
 
-export default function Navigation() {
-    const [activeItem, setActiveItem] = useState('Home');
+const navItems = [
+    { key: 'home', label: 'Home', isContent: false },
+    { key: 'photos', label: 'Photos', isContent: true },
+    { key: 'videos', label: 'Videos', isContent: true },
+    { key: 'live', label: 'Live Streams', isContent: false },
+    { key: 'messages', label: 'Messages', isContent: false },
+];
+
+export default function Navigation({ activeContent, onContentChange }: NavigationProps) {
+    const handleNavClick = (item: typeof navItems[0]) => {
+        if (item.isContent) {
+            onContentChange(item.key as ContentType);
+        }
+    };
 
     return (
         <nav className="navigation">
             {navItems.map((item) => (
                 <a
-                    key={item}
+                    key={item.key}
                     href="#"
-                    className={`nav-item ${activeItem === item ? 'active' : ''}`}
+                    className={`nav-item ${(item.isContent && activeContent === item.key) ||
+                            (!item.isContent && item.key === 'home' && !['photos', 'videos'].includes(activeContent))
+                            ? 'active'
+                            : ''
+                        }`}
                     onClick={(e) => {
                         e.preventDefault();
-                        setActiveItem(item);
+                        handleNavClick(item);
                     }}
                 >
-                    {item}
+                    {item.label}
                 </a>
             ))}
         </nav>

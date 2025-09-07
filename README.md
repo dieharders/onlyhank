@@ -1,4 +1,4 @@
-# OnlyHank - Next.js 15 Cat Content Platform
+# OnlyHank.com - Cat Content Platform
 
 A fun and playful cat-focused content platform built with Next.js 15, featuring Hank the Cat!
 
@@ -11,13 +11,13 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 1. **Install dependencies:**
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. **Run the development server:**
 
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
 3. **Open your browser:**
@@ -62,6 +62,63 @@ Replace emoji placeholders with actual photos of Hank by:
 
 - [ ] User authentication
 - [ ] Multiple cat profiles
-- [ ] Image upload functionality
+- [ ] Image upload functionality (via Google Drive)
 - [ ] Payment integration
-- [ ] Real-time messaging
+- [ ] Real-time messaging (Subs only!)
+
+## ⚙️ Google Drive Integration Process:
+
+### 1. Google Drive API Setup:
+
+You'll need to:
+
+- Create a Google Cloud project
+- Enable Google Drive API
+- Create OAuth 2.0 credentials
+- Get a refresh token
+
+### 2. Environment Setup
+
+Create `.env.local` with your credentials:
+
+```env
+GOOGLE_SERVICE_ACCOUNT_KEY_PATH=./service-account-key.json
+GOOGLE_DRIVE_PARENT_FOLDER_ID=your_onlyhank_folder_id
+```
+
+### 3. Google Drive Folder Structure
+
+Create this structure in your Google Drive:
+
+```
+onlyhank/
+├── photos/
+│   ├── Morning Stretches/
+│   ├── Sunbeam Naps/
+│   └── Treat Reactions/
+└── videos/
+    ├── Zoomies/
+    ├── Box Adventures/
+    └── Toe Bean Close-ups/
+```
+
+### 4. Add Folder Descriptions
+
+1. Right-click each content folder (Morning Stretches, etc.)
+2. Select "View details" or "Manage"
+3. Add descriptions in the folder's metadata/description field
+
+## How It Works
+
+1. **Server Actions**: Fetch folder data from Google Drive API
+2. **Dynamic Content**: Cards generated from folder names and descriptions
+3. **Content Types**: Navigation switches between photos and videos folders
+4. **Real-time Updates**: Purr counters update periodically
+5. **Error Handling**: Graceful handling of API errors and missing folders
+
+## Folder Management
+
+- **Folder Name** → Card Title
+- **Folder Description** → Card Description
+- **Creation Date** → Time ago display
+- **Folder Location** → Content type (photos/videos)

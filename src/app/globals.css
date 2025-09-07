@@ -211,6 +211,50 @@ body {
   padding: 30px;
 }
 
+/* Loading, Error, and Empty States */
+.loading-state,
+.error-state,
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  font-size: 3em;
+  animation: spin 2s linear infinite;
+  margin-bottom: 20px;
+}
+
+.error-icon,
+.empty-icon {
+  font-size: 3em;
+  margin-bottom: 20px;
+}
+
+.error-state p,
+.empty-state p {
+  font-size: 1.2em;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.error-help,
+.empty-help {
+  font-size: 0.9em !important;
+  color: #888 !important;
+  font-style: italic;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 768px) {
   .profile-section {
     flex-direction: column;
