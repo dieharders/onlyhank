@@ -6,7 +6,8 @@ export async function getContentByType(
   contentType: "photos" | "videos"
 ): Promise<DriveFolder[]> {
   try {
-    const folders = await googleDriveService.getFoldersByType(contentType);
+    const gdrive = new googleDriveService();
+    const folders = await gdrive.getFoldersByType(contentType);
     return folders;
   } catch (error) {
     console.error(`Error fetching ${contentType} content:`, error);

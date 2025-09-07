@@ -193,4 +193,4 @@ class GoogleDriveService {
   }
 }
 
-export const googleDriveService = new GoogleDriveService();
+export const googleDriveService = GoogleDriveService;
