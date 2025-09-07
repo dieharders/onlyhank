@@ -187,6 +187,7 @@ Subscribe to unlock this exclusive content from Hank!`);
     };
 
     const handleModalClose = () => {
+        // setModalLoading(false);
         setModalOpen(false);
         setSelectedFolder(null);
         setFolderFiles([]);
@@ -196,7 +197,7 @@ Subscribe to unlock this exclusive content from Hank!`);
         return (
             <main className="content-grid">
                 <div className="loading-state">
-                    <div className="loading-spinner">🐾</div>
+                    <div className="animate-spin text-3xl mb-4">🐾</div>
                     <p>Loading {contentType}...</p>
                 </div>
             </main>
@@ -207,7 +208,7 @@ Subscribe to unlock this exclusive content from Hank!`);
         return (
             <main className="content-grid">
                 <div className="error-state">
-                    <div className="error-icon">😿</div>
+                    <div className="text-4xl mb-4">😿</div>
                     <p>{error}</p>
                     <p className="error-help">
                         Make sure your Google Drive credentials are configured in .env.local
@@ -221,7 +222,7 @@ Subscribe to unlock this exclusive content from Hank!`);
         return (
             <main className="content-grid">
                 <div className="empty-state">
-                    <div className="empty-icon">📁</div>
+                    <div className="text-4xl mb-4">📁</div>
                     <p>No {contentType} found</p>
                     <p className="empty-help">
                         Create folders in your Google Drive under onlyhank/{contentType}
@@ -251,7 +252,7 @@ Subscribe to unlock this exclusive content from Hank!`);
                             </p>
                             <div className="content-meta">
                                 <span>{getTimeAgo(item.createdTime)}</span>
-                                <span className="likes">❤️ {item.purrs} purrs</span>
+                                <span className="flex items-center gap-1">❤️ {item.purrs} purrs</span>
                             </div>
                         </div>
                     </div>
@@ -259,12 +260,12 @@ Subscribe to unlock this exclusive content from Hank!`);
             </main>
 
             {/* Modal Dialog */}
-            <Dialog.Root open={modalOpen} onOpenChange={setModalOpen}>
+            <Dialog.Root open={modalOpen} onOpenChange={handleModalClose}>
                 <Dialog.Portal>
-                    <Dialog.Overlay className="modal-overlay" />
-                    <Dialog.Content className="modal-content">
-                        <div className="modal-header">
-                            <Dialog.Title className="modal-title">
+                    <Dialog.Overlay className="fixed inset-0 bg-black/75 animate-in fade-in duration-150" />
+                    <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-gray1 p-[25px] shadow-[var(--shadow-6)] focus:outline-none">
+                        <div className="flex justify-between items-center p-6 border-b border-gray-200 flex-shrink-0">
+                            <Dialog.Title className="text-xl font-semibold text-gray-900 m-0">
                                 {selectedFolder && (
                                     <>
                                         {getContentEmoji(selectedFolder.name, contentType)} {selectedFolder.name}
@@ -272,74 +273,75 @@ Subscribe to unlock this exclusive content from Hank!`);
                                 )}
                             </Dialog.Title>
                             <Dialog.Close asChild>
-                                <button className="modal-close-button" aria-label="Close">
+                                <button className="bg-none border-none cursor-pointer p-2 rounded-md text-gray-500 hover:bg-gray-100 transition-colors" aria-label="Close">
                                     ✕
                                 </button>
                             </Dialog.Close>
                         </div>
 
                         {selectedFolder?.description && (
-                            <Dialog.Description className="modal-description">
+                            <Dialog.Description className="px-6 my-4 text-gray-500 leading-relaxed flex-shrink-0">
                                 {selectedFolder.description}
                             </Dialog.Description>
                         )}
 
-                        <div className="modal-body">
+                        <div className="flex-1 px-6 overflow-y-auto min-h-0">
                             {modalLoading ? (
-                                <div className="modal-loading">
-                                    <div className="loading-spinner">🐾</div>
+                                <div className="flex flex-col items-center justify-center p-10 text-center h-full">
+                                    <div className="text-4xl animate-spin mb-4">🐾</div>
                                     <p>Loading content...</p>
                                 </div>
                             ) : folderFiles.length > 0 ? (
-                                <div className="files-grid">
+                                <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 py-4 files-grid">
                                     {folderFiles.map((file) => (
-                                        <div key={file.id} className="file-item">
+                                        <div key={file.id} className="flex flex-col items-center text-center">
                                             {file.mimeType.startsWith('image/') ? (
-                                                <div className="image-container">
+                                                <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center relative">
                                                     {file.thumbnailLink ? (
                                                         <Image
                                                             src={file.thumbnailLink}
                                                             alt={file.name}
-                                                            className="file-image"
+                                                            className="w-full h-full object-cover rounded-lg"
                                                             loading="lazy"
                                                             height={200}
                                                             width={200}
+                                                            style={{ width: '100%', height: '100%' }}
                                                         />
                                                     ) : (
-                                                        <div className="file-placeholder">
+                                                        <div className="text-5xl text-gray-400">
                                                             📷
                                                         </div>
                                                     )}
                                                 </div>
                                             ) : file.mimeType.startsWith('video/') ? (
-                                                <div className="video-container">
-                                                    <div className="video-placeholder">
+                                                <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                    <div className="text-5xl text-gray-400">
                                                         🎥
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="file-placeholder">
+                                                <div className="text-5xl text-gray-400">
                                                     📄
                                                 </div>
                                             )}
-                                            <p className="file-name">{file.name}</p>
+                                            <p className="mt-2 text-xs text-gray-700 break-words leading-tight max-w-full">{file.name}</p>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="empty-folder">
-                                    <div className="empty-icon">📁</div>
+                                <div className="flex flex-col items-center justify-center p-10 text-center text-gray-500 h-full">
+                                    <div className="text-5xl mb-4">📁</div>
                                     <p>This folder is empty</p>
                                 </div>
                             )}
                         </div>
 
-                        <div className="modal-footer">
-                            <div className="modal-meta">
+                        <div className="p-6 border-t border-gray-200 flex-shrink-0">
+                            <div className="flex justify-between items-center text-gray-500 text-sm">
                                 {selectedFolder && (
                                     <>
                                         <span>{getTimeAgo(selectedFolder.createdTime)}</span>
-                                        <span className="likes">❤️ {selectedFolder.purrs} purrs</span>
+                                        <span className="flex items-center gap-1">❤️ {selectedFolder.purrs} purrs</span>
                                     </>
                                 )}
                             </div>
@@ -347,203 +349,6 @@ Subscribe to unlock this exclusive content from Hank!`);
                     </Dialog.Content>
                 </Dialog.Portal>
             </Dialog.Root>
-
-            <style jsx>{`
-                .modal-overlay {
-                    background-color: rgba(0, 0, 0, 0.5);
-                    position: fixed;
-                    inset: 0;
-                    animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
-                }
-
-                .modal-content {
-                    background: white;
-                    border-radius: 12px;
-                    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
-                                hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    width: 90vw;
-                    max-width: 800px;
-                    max-height: 90vh;
-                    padding: 0;
-                    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
-                    display: flex;
-                    flex-direction: column;
-                }
-
-                .modal-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 24px;
-                    border-bottom: 1px solid #e5e7eb;
-                }
-
-                .modal-title {
-                    margin: 0;
-                    font-size: 20px;
-                    font-weight: 600;
-                    color: #111827;
-                }
-
-                .modal-close-button {
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    padding: 8px;
-                    border-radius: 6px;
-                    font-size: 16px;
-                    color: #6b7280;
-                    transition: background-color 0.2s;
-                }
-
-                .modal-close-button:hover {
-                    background-color: #f3f4f6;
-                }
-
-                .modal-description {
-                    padding: 0 24px;
-                    margin: 16px 0;
-                    color: #6b7280;
-                    line-height: 1.5;
-                }
-
-                .modal-body {
-                    flex: 1;
-                    padding: 0 24px;
-                    overflow-y: auto;
-                }
-
-                .modal-loading {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 40px;
-                    text-align: center;
-                }
-
-                .files-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                    gap: 16px;
-                    padding: 16px 0;
-                }
-
-                .file-item {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    text-align: center;
-                }
-
-                .image-container,
-                .video-container {
-                    width: 100%;
-                    aspect-ratio: 1;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    background-color: #f3f4f6;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .file-image {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    border-radius: 8px;
-                }
-
-                .file-placeholder,
-                .video-placeholder {
-                    font-size: 48px;
-                    color: #9ca3af;
-                }
-
-                .file-name {
-                    margin-top: 8px;
-                    font-size: 14px;
-                    color: #374151;
-                    word-break: break-word;
-                }
-
-                .empty-folder {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 40px;
-                    text-align: center;
-                    color: #6b7280;
-                }
-
-                .empty-icon {
-                    font-size: 48px;
-                    margin-bottom: 16px;
-                }
-
-                .modal-footer {
-                    padding: 24px;
-                    border-top: 1px solid #e5e7eb;
-                }
-
-                .modal-meta {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    color: #6b7280;
-                    font-size: 14px;
-                }
-
-                .likes {
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                }
-
-                @keyframes overlayShow {
-                    from {
-                        opacity: 0;
-                    }
-                    to {
-                        opacity: 1;
-                    }
-                }
-
-                @keyframes contentShow {
-                    from {
-                        opacity: 0;
-                        transform: translate(-50%, -48%) scale(0.96);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translate(-50%, -50%) scale(1);
-                    }
-                }
-
-                @media (max-width: 640px) {
-                    .modal-content {
-                        width: 95vw;
-                        max-height: 95vh;
-                    }
-
-                    .files-grid {
-                        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                        gap: 12px;
-                    }
-
-                    .modal-header,
-                    .modal-body,
-                    .modal-footer {
-                        padding: 16px;
-                    }
-                }
-            `}</style>
         </>
     );
 }
