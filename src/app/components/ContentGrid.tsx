@@ -262,7 +262,7 @@ Subscribe to unlock this exclusive content from Hank!`);
             <Dialog.Root open={modalOpen} onOpenChange={handleModalClose}>
                 <Dialog.Portal>
                     <Dialog.Overlay className="fixed inset-0 bg-black/75 animate-in fade-in duration-150" />
-                    <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-gray1 p-[25px] shadow-[var(--shadow-6)] focus:outline-none overflow-auto">
+                    <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] max-w-[90vw] xl:w-auto w-full -translate-x-1/2 -translate-y-1/2 rounded-md bg-gray1 p-[25px] shadow-[var(--shadow-6)] focus:outline-none overflow-auto">
                         <div className="flex justify-between items-center p-6 border-b border-gray-200 flex-shrink-0">
                             <Dialog.Title className="text-xl font-semibold text-gray-900 m-0">
                                 {selectedFolder && (
@@ -292,7 +292,7 @@ Subscribe to unlock this exclusive content from Hank!`);
                                 </div>
                             ) : folderFiles.length > 0 ? (
                                 <div className="py-4 files-list">
-                                    <div className="flex flex-wrap items-start gap-2">
+                                    <div className="flex flex-row flex-wrap items-start justify-center gap-[2rem]">
                                         {folderFiles.map((file) => (
                                             <div key={file.id} className="flex flex-col items-center">
                                                 {file.mimeType.startsWith('image/') ? (
