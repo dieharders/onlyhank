@@ -47,7 +47,7 @@ class GoogleDriveService {
         // Running on Vercel - parse JSON credentials
         try {
           // Create service account auth
-          const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '')
+          const credentials = JSON.parse(keyPath || '')
           this.auth = new google.auth.GoogleAuth({
             credentials: credentials,
             scopes: scopes,
