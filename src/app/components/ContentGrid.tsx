@@ -263,7 +263,7 @@ Subscribe to unlock this exclusive content from Hank!`);
             <Dialog.Root open={modalOpen} onOpenChange={handleModalClose}>
                 <Dialog.Portal>
                     <Dialog.Overlay className="fixed inset-0 bg-black/75 animate-in fade-in duration-150" />
-                    <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-gray1 p-[25px] shadow-[var(--shadow-6)] focus:outline-none">
+                    <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-gray1 p-[25px] shadow-[var(--shadow-6)] focus:outline-none overflow-auto">
                         <div className="flex justify-between items-center p-6 border-b border-gray-200 flex-shrink-0">
                             <Dialog.Title className="text-xl font-semibold text-gray-900 m-0">
                                 {selectedFolder && (
@@ -292,41 +292,44 @@ Subscribe to unlock this exclusive content from Hank!`);
                                     <p>Loading content...</p>
                                 </div>
                             ) : folderFiles.length > 0 ? (
-                                <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 py-4 files-grid">
-                                    {folderFiles.map((file) => (
-                                        <div key={file.id} className="flex flex-col items-center text-center">
-                                            {file.mimeType.startsWith('image/') ? (
-                                                <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center relative">
-                                                    {file.thumbnailLink ? (
-                                                        <Image
-                                                            src={file.thumbnailLink}
-                                                            alt={file.name}
-                                                            className="w-full h-full object-cover rounded-lg"
-                                                            loading="lazy"
-                                                            height={200}
-                                                            width={200}
-                                                            style={{ width: '100%', height: '100%' }}
-                                                        />
-                                                    ) : (
-                                                        <div className="text-5xl text-gray-400">
-                                                            📷
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ) : file.mimeType.startsWith('video/') ? (
-                                                <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-                                                    <div className="text-5xl text-gray-400">
-                                                        🎥
+                                <div className="py-4 files-list">
+                                    <div className="flex flex-wrap items-start gap-2">
+                                        {folderFiles.map((file) => (
+                                            <div key={file.id} className="flex flex-col items-center">
+                                                {file.mimeType.startsWith('image/') ? (
+                                                    <div className="relative rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                        {file.thumbnailLink ? (
+                                                            <Image
+                                                                src={file.thumbnailLink}
+                                                                alt={file.name}
+                                                                className="rounded-lg object-cover h-[200px]"
+                                                                loading="lazy"
+                                                                width={200}
+                                                                height={200}
+                                                            />
+                                                        ) : (
+                                                            <div className="w-[200px] h-[200px] flex items-center justify-center text-5xl text-gray-400 rounded-lg bg-gray-100">
+                                                                📷
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                </div>
-                                            ) : (
-                                                <div className="text-5xl text-gray-400">
-                                                    📄
-                                                </div>
-                                            )}
-                                            <p className="mt-2 text-xs text-gray-700 break-words leading-tight max-w-full">{file.name}</p>
-                                        </div>
-                                    ))}
+                                                ) : file.mimeType.startsWith('video/') ? (
+                                                    <div className="w-[200px] h-[200px] rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                        <div className="text-5xl text-gray-400">
+                                                            🎥
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="w-[200px] h-[200px] rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                        <div className="text-5xl text-gray-400">
+                                                            📄
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <p className="mt-2 text-xs text-gray-700 break-words leading-tight max-w-[200px] text-center">{file.name}</p>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center justify-center p-10 text-center text-gray-500 h-full">
