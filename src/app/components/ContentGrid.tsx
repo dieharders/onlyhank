@@ -161,15 +161,15 @@ export default function ContentGrid({ contentType }: ContentGridProps) {
     }, [content.length]);
 
     const handleContentClick = async (item: ContentItem) => {
-        console.log('Clicked folder:', item);
+        // console.log('Clicked folder:', item);
         setSelectedFolder(item);
         setModalOpen(true);
         setModalLoading(true);
 
         try {
-            console.log('Fetching files for folder ID:', item.id);
+            // console.log('Fetching files for folder ID:', item.id);
             const files = await getFolderFiles(item.id);
-            console.log('Retrieved files:', files);
+            // console.log('Retrieved files:', files);
             setFolderFiles(files);
         } catch (err) {
             console.error('Error loading folder files:', err);
@@ -187,7 +187,6 @@ Subscribe to unlock this exclusive content from Hank!`);
     };
 
     const handleModalClose = () => {
-        // setModalLoading(false);
         setModalOpen(false);
         setSelectedFolder(null);
         setFolderFiles([]);
