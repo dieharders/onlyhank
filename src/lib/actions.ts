@@ -26,10 +26,10 @@ interface DriveFile {
 export async function getFolderFiles(folderId: string): Promise<DriveFile[]> {
   try {
     // console.log("=== getFolderFiles Debug ===");
-    // console.log("Folder ID:", folderId);
+    console.log('Folder ID:', folderId)
 
     const googleDriveService = new GoogleDriveService()
-    // console.log("Google Drive service created");
+    // console.log('Google Drive service created')
 
     // First, let's verify the folder exists and we can access it
     try {
@@ -37,7 +37,7 @@ export async function getFolderFiles(folderId: string): Promise<DriveFile[]> {
         fileId: folderId,
         fields: 'id, name, mimeType, parents',
       })
-      // console.log("Folder info:", folderInfo.data);
+      console.log('Folder info:', folderInfo.data)
     } catch (folderError: any) {
       console.error('Cannot access folder:', folderError)
       throw new Error(`Cannot access folder ${folderId}: ${folderError.message}`)
@@ -56,7 +56,7 @@ export async function getFolderFiles(folderId: string): Promise<DriveFile[]> {
     })
 
     // console.log("Raw API response:", JSON.stringify(response.data, null, 2));
-    // console.log("Files found:", response.data.files?.length || 0);
+    console.log('Files found:', response.data.files?.length || 0)
 
     // if (response.data.files) {
     //   response.data.files.forEach((file: any, index: number) => {
