@@ -302,10 +302,13 @@ Subscribe to unlock this exclusive content from Hank!`);
                                                             <Image
                                                                 src={file.thumbnailLink}
                                                                 alt={file.name}
-                                                                className="rounded-lg object-cover h-[200px]"
+                                                                className="rounded-lg object-cover h-[200px] cursor-pointer hover:opacity-80 transition-opacity"
                                                                 loading="lazy"
                                                                 width={200}
                                                                 height={200}
+                                                                onClick={() => {
+                                                                    if (file?.webViewLink) window.open(file.webViewLink, '_blank')
+                                                                }}
                                                             />
                                                         ) : (
                                                             <div className="w-[200px] h-[200px] flex items-center justify-center text-5xl text-gray-400 rounded-lg bg-gray-100">
