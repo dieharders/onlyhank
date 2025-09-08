@@ -9,10 +9,18 @@ export interface DriveFolder {
 }
 
 class GoogleDriveService {
-  private drive;
-  private auth;
+  public drive: any = null; // Initialize as null
+  private auth: any = null;
+  private initialized = false;
 
   constructor() {
+    // Initialize immediately in constructor
+    this.initialize();
+  }
+
+  private initialize() {
+    if (this.initialized) return;
+
     // Validate environment variables
     const keyPath = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH;
     const parentFolderId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID;
@@ -42,11 +50,19 @@ class GoogleDriveService {
       this.drive = google.drive({ version: "v3", auth: this.auth });
 
       console.log("Google Drive service initialized with service account");
+      this.initialized = true;
     } catch (error) {
       console.error("Failed to initialize Google Drive service:", error);
       throw new Error(
         `Failed to load service account key from ${keyPath}: ${error}`
       );
+    }
+  }
+
+  // Ensure initialization before any method call
+  private ensureInitialized() {
+    if (!this.initialized || !this.drive) {
+      this.initialize();
     }
   }
 
@@ -65,6 +81,8 @@ class GoogleDriveService {
   async getFoldersByType(
     folderType: "photos" | "videos"
   ): Promise<DriveFolder[]> {
+    this.ensureInitialized(); // Ensure initialization
+
     try {
       // Extract folder ID from URL if needed
       const parentFolderUrl = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID!;
@@ -108,7 +126,7 @@ class GoogleDriveService {
       });
 
       const folders: DriveFolder[] =
-        response.data.files?.map((file) => ({
+        response.data.files?.map((file: any) => ({
           id: file.id!,
           name: file.name!,
           description: file.description || "",
@@ -146,6 +164,8 @@ class GoogleDriveService {
 
   // Test method to verify connection and permissions
   async testConnection(): Promise<boolean> {
+    this.ensureInitialized(); // Ensure initialization
+
     try {
       // Test basic API access
       const about = await this.drive.about.get({ fields: "user" });
@@ -193,4 +213,4 @@ class GoogleDriveService {
   }
 }
 
-export const googleDriveService = GoogleDriveService;
+export default GoogleDriveService;

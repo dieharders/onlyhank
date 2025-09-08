@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { getContentByType } from '../../lib/actions';
+import Image from 'next/image';
+import * as Dialog from '@radix-ui/react-dialog';
+import { getContentByType, getFolderFiles } from '../../lib/actions';
 import { getTimeAgo } from '../../lib/utils';
 import type { DriveFolder } from '../../lib/google-drive';
 import type { ContentType } from '../page';
@@ -13,6 +15,14 @@ interface ContentGridProps {
 interface ContentItem extends DriveFolder {
     emoji?: string;
     purrs: number;
+}
+
+interface DriveFile {
+    id: string;
+    name: string;
+    thumbnailLink?: string;
+    webViewLink?: string;
+    mimeType: string;
 }
 
 const placeholderData: ContentItem[] = [
@@ -81,13 +91,17 @@ export default function ContentGrid({ contentType }: ContentGridProps) {
     const [content, setContent] = useState<ContentItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedFolder, setSelectedFolder] = useState<ContentItem | null>(null);
+    const [folderFiles, setFolderFiles] = useState<DriveFile[]>([]);
+    const [modalLoading, setModalLoading] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
 
     const renderPlaceHolderData = useCallback(() => {
         return placeholderData.map((item) => (
             <div
                 key={item.id}
                 className="content-card"
-                onClick={() => handleContentClick(item.name)}
+                onClick={() => handlePlaceholderClick(item)}
             >
                 <div className="content-image">
                     {getContentEmoji(item.name, contentType)}
@@ -146,17 +160,43 @@ export default function ContentGrid({ contentType }: ContentGridProps) {
         return () => clearInterval(interval);
     }, [content.length]);
 
-    const handleContentClick = (title: string) => {
-        alert(`🔒 Premium Content: ${title}
+    const handleContentClick = async (item: ContentItem) => {
+        // console.log('Clicked folder:', item);
+        setSelectedFolder(item);
+        setModalOpen(true);
+        setModalLoading(true);
+
+        try {
+            // console.log('Fetching files for folder ID:', item.id);
+            const files = await getFolderFiles(item.id);
+            // console.log('Retrieved files:', files);
+            setFolderFiles(files);
+        } catch (err) {
+            console.error('Error loading folder files:', err);
+            setError(`Failed to load folder contents: ${err instanceof Error ? err.message : 'Unknown error'}`);
+            setFolderFiles([]);
+        } finally {
+            setModalLoading(false);
+        }
+    };
+
+    const handlePlaceholderClick = (item: ContentItem) => {
+        alert(`🔒 Premium Content: ${item.name}
 
 Subscribe to unlock this exclusive content from Hank!`);
+    };
+
+    const handleModalClose = () => {
+        setModalOpen(false);
+        setSelectedFolder(null);
+        setFolderFiles([]);
     };
 
     if (loading) {
         return (
             <main className="content-grid">
                 <div className="loading-state">
-                    <div className="loading-spinner">🐾</div>
+                    <div className="animate-spin text-3xl mb-4">🐾</div>
                     <p>Loading {contentType}...</p>
                 </div>
             </main>
@@ -167,7 +207,7 @@ Subscribe to unlock this exclusive content from Hank!`);
         return (
             <main className="content-grid">
                 <div className="error-state">
-                    <div className="error-icon">😿</div>
+                    <div className="text-4xl mb-4">😿</div>
                     <p>{error}</p>
                     <p className="error-help">
                         Make sure your Google Drive credentials are configured in .env.local
@@ -181,7 +221,7 @@ Subscribe to unlock this exclusive content from Hank!`);
         return (
             <main className="content-grid">
                 <div className="empty-state">
-                    <div className="empty-icon">📁</div>
+                    <div className="text-4xl mb-4">📁</div>
                     <p>No {contentType} found</p>
                     <p className="empty-help">
                         Create folders in your Google Drive under onlyhank/{contentType}
@@ -193,28 +233,127 @@ Subscribe to unlock this exclusive content from Hank!`);
     }
 
     return (
-        <main className="content-grid">
-            {content.map((item) => (
-                <div
-                    key={item.id}
-                    className="content-card"
-                    onClick={() => handleContentClick(item.name)}
-                >
-                    <div className="content-image">
-                        {getContentEmoji(item.name, contentType)}
-                    </div>
-                    <div className="content-info">
-                        <h3 className="content-title">{item.name}</h3>
-                        <p className="content-description">
-                            {item.description || `Exclusive ${contentType.slice(0, -1)} content featuring Hank!`}
-                        </p>
-                        <div className="content-meta">
-                            <span>{getTimeAgo(item.createdTime)}</span>
-                            <span className="likes">❤️ {item.purrs} purrs</span>
+        <>
+            <main className="content-grid">
+                {content.map((item) => (
+                    <div
+                        key={item.id}
+                        className="content-card"
+                        onClick={() => handleContentClick(item)}
+                    >
+                        <div className="content-image">
+                            {getContentEmoji(item.name, contentType)}
+                        </div>
+                        <div className="content-info">
+                            <h3 className="content-title">{item.name}</h3>
+                            <p className="content-description">
+                                {item.description || `Exclusive ${contentType.slice(0, -1)} content featuring Hank!`}
+                            </p>
+                            <div className="content-meta">
+                                <span>{getTimeAgo(item.createdTime)}</span>
+                                <span className="flex items-center gap-1">❤️ {item.purrs} purrs</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            ))}
-        </main>
+                ))}
+            </main>
+
+            {/* Modal Dialog */}
+            <Dialog.Root open={modalOpen} onOpenChange={handleModalClose}>
+                <Dialog.Portal>
+                    <Dialog.Overlay className="fixed inset-0 bg-black/75 animate-in fade-in duration-150" />
+                    <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-gray1 p-[25px] shadow-[var(--shadow-6)] focus:outline-none overflow-auto">
+                        <div className="flex justify-between items-center p-6 border-b border-gray-200 flex-shrink-0">
+                            <Dialog.Title className="text-xl font-semibold text-gray-900 m-0">
+                                {selectedFolder && (
+                                    <>
+                                        {getContentEmoji(selectedFolder.name, contentType)} {selectedFolder.name}
+                                    </>
+                                )}
+                            </Dialog.Title>
+                            <Dialog.Close asChild>
+                                <button className="bg-none border-none cursor-pointer p-2 rounded-md text-gray-500 hover:bg-gray-100 transition-colors" aria-label="Close">
+                                    ✕
+                                </button>
+                            </Dialog.Close>
+                        </div>
+
+                        {selectedFolder?.description && (
+                            <Dialog.Description className="px-6 my-4 text-gray-500 leading-relaxed flex-shrink-0">
+                                {selectedFolder.description}
+                            </Dialog.Description>
+                        )}
+
+                        <div className="flex-1 px-6 overflow-y-auto min-h-0">
+                            {modalLoading ? (
+                                <div className="flex flex-col items-center justify-center p-10 text-center h-full">
+                                    <div className="text-4xl animate-spin mb-4">🐾</div>
+                                    <p>Loading content...</p>
+                                </div>
+                            ) : folderFiles.length > 0 ? (
+                                <div className="py-4 files-list">
+                                    <div className="flex flex-wrap items-start gap-2">
+                                        {folderFiles.map((file) => (
+                                            <div key={file.id} className="flex flex-col items-center">
+                                                {file.mimeType.startsWith('image/') ? (
+                                                    <div className="relative rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                        {file.thumbnailLink ? (
+                                                            <Image
+                                                                src={file.thumbnailLink}
+                                                                alt={file.name}
+                                                                className="rounded-lg object-cover h-[200px] cursor-pointer hover:opacity-80 transition-opacity"
+                                                                loading="lazy"
+                                                                width={200}
+                                                                height={200}
+                                                                onClick={() => {
+                                                                    if (file?.webViewLink) window.open(file.webViewLink, '_blank')
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <div className="w-[200px] h-[200px] flex items-center justify-center text-5xl text-gray-400 rounded-lg bg-gray-100">
+                                                                📷
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : file.mimeType.startsWith('video/') ? (
+                                                    <div className="w-[200px] h-[200px] rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                        <div className="text-5xl text-gray-400">
+                                                            🎥
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="w-[200px] h-[200px] rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                        <div className="text-5xl text-gray-400">
+                                                            📄
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <p className="mt-2 text-xs text-gray-700 break-words leading-tight max-w-[200px] text-center">{file.name}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center p-10 text-center text-gray-500 h-full">
+                                    <div className="text-5xl mb-4">📁</div>
+                                    <p>This folder is empty</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-6 border-t border-gray-200 flex-shrink-0">
+                            <div className="flex justify-between items-center text-gray-500 text-sm">
+                                {selectedFolder && (
+                                    <>
+                                        <span>{getTimeAgo(selectedFolder.createdTime)}</span>
+                                        <span className="flex items-center gap-1">❤️ {selectedFolder.purrs} purrs</span>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            </Dialog.Root>
+        </>
     );
 }
