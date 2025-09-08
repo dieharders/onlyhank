@@ -34,12 +34,12 @@ Thank you for supporting quality cat content! 💖`);
 
     return (
         <section className="profile-section">
-            <div className="flex items-center justify-center rounded bg-transparent">
+            <div className="flex flex-none items-center justify-center rounded bg-transparent">
                 <Image src={profilePic} alt="🐈" width={300} height={300} className="object-cover rounded-full border-[5px] border-red-400 shadow-[0_10px_30px_rgba(0,0,0,0.1)]" />
             </div>
-            <div className="flex-1">
+            <div className="flex flex-1 flex-col flex-wrap">
                 <h1 className="profile-name">Hank (Kikiki)</h1>
-                <div className="profile-stats">
+                <div className="flex flex-row flex-wrap gap-[30px] my-5 md:justify-start justify-center">
                     {stats.map((stat, index) => (
                         <div key={index} className="stat">
                             <div className="stat-number">{stat.number}</div>
