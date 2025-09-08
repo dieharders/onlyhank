@@ -1,33 +1,42 @@
 import { violet, blackA, mauve, green, gray } from "@radix-ui/colors";
 
 /** @type {import('tailwindcss').Config} */
-export const content = ["./App.jsx"];
-export const theme = {
-  extend: {
-    colors: {
-      ...mauve,
-      ...violet,
-      ...green,
-      ...blackA,
-      ...gray,
-    },
-    keyframes: {
-      overlayShow: {
-        from: { opacity: "0" },
-        to: { opacity: "1" },
+
+module.exports = {
+  content: [
+    "./src/**/*.{js,ts,jsx,tsx}", // mine
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    // Add other relevant paths here
+  ],
+  theme: {
+    extend: {
+      colors: {
+        ...mauve,
+        ...violet,
+        ...green,
+        ...blackA,
+        ...gray,
       },
-      contentShow: {
-        from: {
-          opacity: "0",
-          transform: "translate(-50%, -48%) scale(0.96)",
+      keyframes: {
+        overlayShow: {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
         },
-        to: { opacity: "1", transform: "translate(-50%, -50%) scale(1)" },
+        contentShow: {
+          from: {
+            opacity: "0",
+            transform: "translate(-50%, -48%) scale(0.96)",
+          },
+          to: { opacity: "1", transform: "translate(-50%, -50%) scale(1)" },
+        },
       },
-    },
-    animation: {
-      overlayShow: "overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1)",
-      contentShow: "contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+      animation: {
+        overlayShow: "overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+        contentShow: "contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+      },
     },
   },
+  plugins: [require("tailwindcss-animate")],
 };
-export const plugins = [];
